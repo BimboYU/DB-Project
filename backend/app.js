@@ -150,14 +150,14 @@ app.use((err, req, res, next) => {
 // Start Server
 // ========================
 async function startServer() {
-    console.log('\n🚀 Starting NGO ERP Portal Backend...');
+    console.log('\nStarting NGO ERP Portal Backend...');
     console.log('========================================\n');
     
     // Test database connection
     const dbConnected = await testDatabaseConnection();
     if (!dbConnected) {
         console.error('\nFATAL: Database connection failed. Server cannot start.');
-        console.error('💡 Check:');
+        console.error('Check:');
         console.error('   1. Oracle database is running');
         console.error('   2. .env file has correct credentials');
         console.error('   3. Oracle listener is active');

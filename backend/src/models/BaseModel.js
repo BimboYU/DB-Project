@@ -1,4 +1,3 @@
-// BaseModel.js
 const db = require('../config/database');
 const oracledb = require('oracledb');
 
@@ -6,6 +5,27 @@ class BaseModel {
     constructor(tableName) {
         this.tableName = tableName;
         this.primaryKey = `${tableName.split('_').map(word => word.toUpperCase()).join('_')}_ID`;
+    }
+
+    async count(conditions = {}) {
+        let sql = `SELECT COUNT(*) as TOTAL FROM ${this.tableName}`;
+        const binds = [];
+        
+        if (Object.keys(conditions).length > 0) {
+            const whereClauses = [];
+            Object.entries(conditions).forEach(([key, value], index) => {
+                whereClauses.push(`${key} = :${index + 1}`);
+                binds.push(value);
+            });
+            sql += ` WHERE ${whereClauses.join(' AND ')}`;
+        }
+        
+        const result = await db.executeQuery(sql, binds);
+        
+        if (result.success && result.rows.length > 0) {
+            return result.rows[0].TOTAL;
+        }
+        return 0;
     }
 
     async findAll(conditions = {}, options = {}) {
@@ -22,11 +42,16 @@ class BaseModel {
         }
         
         if (options.orderBy) {
-            sql += ` ORDER BY ${options.orderBy}`;
+            const orderByColumns = options.orderBy.split(',').map(col => col.trim()).join(', ');
+            sql += ` ORDER BY ${orderByColumns}`;
+        }
+        
+        if (options.offset) {
+            sql += ` OFFSET ${parseInt(options.offset)} ROWS`;
         }
         
         if (options.limit) {
-            sql += ` FETCH FIRST ${options.limit} ROWS ONLY`;
+            sql += ` FETCH FIRST ${parseInt(options.limit)} ROWS ONLY`;
         }
         
         const result = await db.executeQuery(sql, binds);

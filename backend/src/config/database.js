@@ -18,7 +18,6 @@ class Database {
         
         // Initialize Oracle settings
         oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
-        oracledb.autoCommit = false;
         
         // Try to initialize Oracle Client
         try {

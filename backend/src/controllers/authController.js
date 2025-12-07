@@ -54,13 +54,6 @@ class AuthController {
         AGE: Age ? parseInt(Age) : null,
       };
       const personId = await PersonModel.createPerson(personData);
-      try {
-        // Assign default Staff role (ID 2)
-        await RoleModel.assignRoleToUser(userId, 2);
-        console.log("Assigned default Staff role to new user");
-      } catch (error) {
-        console.log("Note: Could not assign default role:", error.message);
-      }
 
       // Hash password
       const hashedPassword = await bcrypt.hash(Password, 10);
@@ -81,12 +74,20 @@ class AuthController {
         console.log("Note: Could not create donor record:", error.message);
       }
 
-      // Assign default role if provided
-      if (Role_ID) {
+      // Assign default Staff role (ID 2)
+      try {
+        await RoleModel.assignRoleToUser(userId, 2);
+        console.log("Assigned default Staff role to new user");
+      } catch (error) {
+        console.log("Note: Could not assign default role:", error.message);
+      }
+
+      // Assign additional role if provided
+      if (Role_ID && Role_ID !== 2) {
         try {
           await RoleModel.assignRoleToUser(userId, Role_ID);
         } catch (error) {
-          console.log("Note: Could not assign role:", error.message);
+          console.log("Note: Could not assign additional role:", error.message);
         }
       }
 
